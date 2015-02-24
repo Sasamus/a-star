@@ -33,11 +33,11 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 	public Solution<City, DriveAction> search(
 			SearchProblem<City, DriveAction> problem, Heuristic<City> heuristic) {
 
-		// /* ----- You should remove this ----- */
-		// System.out.println("I'm just going to drive around randomly until I reach my goal...");
-		// InformedSearch<City,DriveAction> randomSearch = new RandomSearch<>();
-		// return randomSearch.search(problem, heuristic);
-		// /* ----- You should remove this ----- */
+//		 /* ----- You should remove this ----- */
+//		 System.out.println("I'm just going to drive around randomly until I reach my goal...");
+//		 InformedSearch<City,DriveAction> randomSearch = new RandomSearch<>();
+//		 return randomSearch.search(problem, heuristic);
+//		 /* ----- You should remove this ----- */
 
 		// A Comparator
 		final Comparator<Successor<City, DriveAction>> comparator = new Comparator<Successor<City, DriveAction>>() {
@@ -45,8 +45,6 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 			@Override
 			public int compare(Successor<City, DriveAction> c1,
 					Successor<City, DriveAction> c2) {
-
-				// TODO: Add g(n) to comparator
 
 				return (heuristic.apply(c1.state) - heuristic.apply(c2.state));
 			}
