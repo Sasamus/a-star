@@ -177,8 +177,8 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 	}
 
 	public static void main(String[] args) {
-		City start = City.LUGOJ;
-		City goal = City.ARAD;
+		City start = City.ARAD;
+		City goal = City.BUCHAREST;
 		TouringRomaniaProblem problem = TouringRomaniaProblem.getInstance(
 				start, goal);
 
