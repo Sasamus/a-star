@@ -1,5 +1,6 @@
 package se.miun.dt015a.astar.romania;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -37,30 +38,36 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 		// /* ----- You should remove this ----- */
 
 		// A Comparator
-		final Comparator<City> comparator = new Comparator<City>() {
+		final Comparator<Successor<City, DriveAction>> comparator = new Comparator<Successor<City, DriveAction>>() {
 
 			@Override
-			public int compare(City c1, City c2) {
+			public int compare(Successor<City, DriveAction> c1, Successor<City, DriveAction> c2) {
 
 				// TODO: Add g(n) to comparator
 
-				return (int) (heuristic.apply(c1) - heuristic.apply(c2));
+				return (heuristic.apply(c1.state) - heuristic.apply(c2.state));
 			}
 		};
 
 		// A node to hold the current state, currently at the start state
-		City node = problem.getStart();
+		Successor<City, DriveAction> node = new Successor<City, DriveAction>(problem.getStart(), null, 0);
 
 		// Hold the nodes int he frontier
-		PriorityQueue<City> frontier = new PriorityQueue<City>(comparator);
+		PriorityQueue<Successor<City, DriveAction>> frontier = new PriorityQueue<Successor<City, DriveAction>>(comparator);
 
 		// A HashSet to hold the explored nodes
 		HashSet<City> explored = new HashSet<City>();
 
 		// Holds the successors
-		HashSet<Successor<City, DriveAction>> successors;
+		Set<Successor<City, DriveAction>> successors;
+		
+		// Holds the path to the goal
+		ArrayList<Successor<City, DriveAction>> path = new ArrayList<Successor<City, DriveAction>>();
+		
+		// Add node to path as a Successor
+		path.add(node);
 
-		// Add node to frontier
+		// Add node as a Successor to frontier
 		frontier.add(node);
 
 		// Loop forever
@@ -75,47 +82,50 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 
 			// Get the next node from frontier
 			node = frontier.poll();
+			
+			// Add node to path
+			path.add(node);
 
 			// Check if node equals the goal state
-			if (problem.isGoal(node)) {
-
-				// TODO: Return solution here
+			if (problem.isGoal(node.state)) {
+				
+				// TODO: path does not seem to be correct
+				return new Solution<City, DriveAction>(path);
 			}
 
 			// Add node to explored
-			explored.add(node);
+			explored.add(node.state);
 
 			// Get Successors to node
-			successors = (HashSet<Successor<City, DriveAction>>) problem
-					.getSuccessors(node);
+			successors = problem
+					.getSuccessors(node.state);
 
 			// Holds the Node to be removed
-			City replaceNode = null;
+			Successor<City, DriveAction> replaceNode = null;
 
 			// Iterate through the successors in successors
 			for (Successor<City, DriveAction> successor : successors) {
 
-				// Check if an successors state exists in explored or frontier
+				// Check if successors state exists in explored or frontier
 				if (!explored.contains(successor.state)
 						&& !frontier.contains(successor.state)) {
 
 					// If it doesn't, insert successors state in frontier
-					frontier.add(successor.state);
+					frontier.add(successor);
 
-				}
-				// If frontier contains successors.state
-				else if (frontier.contains(successor.state)) {
-
+				} else {
+					
+					// If it does
 					// Iterate through frontier
-					for (City tmpNode : frontier) {
+					for (Successor<City, DriveAction> tmpNode : frontier) {
 
-						// If tmpNode equals successor.state
-						if (tmpNode.equals(successor.state)) {
+						// If tmpNode.state equals successor.state
+						if (tmpNode.state.equals(successor.state)) {
 
-							// Check if sucessor.state is better according to
+							// Check if successor is better than tmpNode according to
 							// comparator
 							if (0 > comparator
-									.compare(tmpNode, successor.state)) {
+									.compare(tmpNode, successor)) {
 
 								// If it is, set replaceNode to tmpNode
 								replaceNode = tmpNode;
@@ -131,7 +141,7 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 					frontier.remove(replaceNode);
 
 					// Add successor.state to frontier
-					frontier.add(successor.state);
+					frontier.add(successor);
 				}
 			}
 		}
@@ -154,7 +164,7 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 
 		TouringRomania solver = new TouringRomania();
 		System.out.println("Starting search...");
-		Solution<City, DriveAction> solution = solver.search(problem, null);
+		Solution<City, DriveAction> solution = solver.search(problem, TouringRomaniaProblem.MANHATTAN_DISTANCE_HEURISTIC);
 		System.out.println("Found a solution with total cost "
 				+ solution.getCost());
 		System.out.println("Solution visits these cities: "
