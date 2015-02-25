@@ -33,11 +33,14 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 	public Solution<City, DriveAction> search(
 			SearchProblem<City, DriveAction> problem, Heuristic<City> heuristic) {
 
-//		 /* ----- You should remove this ----- */
-//		 System.out.println("I'm just going to drive around randomly until I reach my goal...");
-//		 InformedSearch<City,DriveAction> randomSearch = new RandomSearch<>();
-//		 return randomSearch.search(problem, heuristic);
-//		 /* ----- You should remove this ----- */
+		// /* ----- You should remove this ----- */
+		// System.out.println("I'm just going to drive around randomly until I reach my goal...");
+		// InformedSearch<City,DriveAction> randomSearch = new RandomSearch<>();
+		// return randomSearch.search(problem, heuristic);
+		// /* ----- You should remove this ----- */
+
+		// Holds a map of children and their parents
+		HashMap<Successor<City, DriveAction>, Successor<City, DriveAction>> parentMap = new HashMap<Successor<City, DriveAction>, Successor<City, DriveAction>>();
 
 		// A Comparator
 		final Comparator<Successor<City, DriveAction>> comparator = new Comparator<Successor<City, DriveAction>>() {
@@ -45,11 +48,44 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 			@Override
 			public int compare(Successor<City, DriveAction> c1,
 					Successor<City, DriveAction> c2) {
-				
+
+				// Holds the g(n) cost of c1 and c2
+				int c1G = c1.cost;
+				int c2G = c2.cost;
+
+				// Holds a temparary node, initialized to c1
+				Successor<City, DriveAction> tmpNode = c1;
+
+				// While tmpNode is a key in parentMap
+				while (parentMap.containsKey(tmpNode)) {
+
+					// Get parent of node from parentMap
+					tmpNode = parentMap.get(tmpNode);
+
+					// Add tmpNode.cost to c1G
+					c1G = c1G + tmpNode.cost;
+
+				}
+
+				// Set tmpNode to c2
+				tmpNode = c2;
+
+				// While tmpNode is a key in parentMap
+				while (parentMap.containsKey(tmpNode)) {
+
+					// Get parent of node from parentMap
+					tmpNode = parentMap.get(tmpNode);
+
+					// Add tmpNode.cost to c2G
+					c2G = c2G + tmpNode.cost;
+				}
+
 				// Return 1 of c2 is best, -1 if c1 is and 0 if they are equal
-				if((heuristic.apply(c1.state) > heuristic.apply(c2.state))) {
+				if ((heuristic.apply(c1.state) + c1G) > (heuristic
+						.apply(c2.state) + c2G)) {
 					return 1;
-				} else if((heuristic.apply(c1.state) < heuristic.apply(c2.state))) {
+				} else if ((heuristic.apply(c1.state) + c1G) < (heuristic
+						.apply(c2.state) + c2G)) {
 					return -1;
 				}
 				return 0;
@@ -60,21 +96,18 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 		Successor<City, DriveAction> node = new Successor<City, DriveAction>(
 				problem.getStart(), null, 0);
 
-		// Hold the nodes int he frontier
-		PriorityQueue<Successor<City, DriveAction>> frontier = new PriorityQueue<Successor<City, DriveAction>>(
-				comparator);
-
 		// A HashSet to hold the explored nodes
 		HashSet<City> explored = new HashSet<City>();
 
 		// Holds the successors
 		Set<Successor<City, DriveAction>> successors;
 
+		// Hold the nodes in the frontier
+		PriorityQueue<Successor<City, DriveAction>> frontier = new PriorityQueue<Successor<City, DriveAction>>(
+				comparator);
+
 		// Holds the path to the goal
 		ArrayList<Successor<City, DriveAction>> path = new ArrayList<Successor<City, DriveAction>>();
-
-		// Holds a map of children and their parents
-		HashMap<Successor<City, DriveAction>, Successor<City, DriveAction>> parentMap = new HashMap<Successor<City, DriveAction>, Successor<City, DriveAction>>();
 
 		// Add node to frontier
 		frontier.add(node);
@@ -98,8 +131,8 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 				// Add node to path
 				path.add(node);
 
-				// A Successor to hold the parent node
-				Successor<City, DriveAction> parent;
+				// A Successor to hold a parent node
+				Successor<City, DriveAction> parent = null;
 
 				// While node is a key in parentMap
 				while (parentMap.containsKey(node)) {
