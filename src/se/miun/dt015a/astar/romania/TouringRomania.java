@@ -45,8 +45,14 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 			@Override
 			public int compare(Successor<City, DriveAction> c1,
 					Successor<City, DriveAction> c2) {
-
-				return (heuristic.apply(c1.state) - heuristic.apply(c2.state));
+				
+				// Return 1 of c2 is best, -1 if c1 is and 0 if they are equal
+				if((heuristic.apply(c1.state) > heuristic.apply(c2.state))) {
+					return 1;
+				} else if((heuristic.apply(c1.state) < heuristic.apply(c2.state))) {
+					return -1;
+				}
+				return 0;
 			}
 		};
 
