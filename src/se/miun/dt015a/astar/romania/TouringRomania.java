@@ -50,10 +50,25 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 					Successor<City, DriveAction> c2) {
 
 				// Holds the g(n) cost of c1 and c2
-				int c1G = c1.cost;
-				int c2G = c2.cost;
+				int c1G;
+				int c2G;
 
-				// Holds a temparary node, initialized to c1
+				// Check if the Heuristic is MIN_NODES_TRAVERSED_HEURISTIC
+				if (heuristic
+						.equals(TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC)) {
+
+					// c1G and c2G will be counted as nodes
+					c1G = 1;
+					c2G = 1;
+
+				} else {
+
+					// c1G and c2G will be counted as distance
+					c1G = c1.cost;
+					c2G = c2.cost;
+				}
+
+				// Holds a temporary node, initialized to c1
 				Successor<City, DriveAction> tmpNode = c1;
 
 				// While tmpNode is a key in parentMap
@@ -62,8 +77,18 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 					// Get parent of node from parentMap
 					tmpNode = parentMap.get(tmpNode);
 
-					// Add tmpNode.cost to c1G
-					c1G = c1G + tmpNode.cost;
+					// Check if the Heuristic is MIN_NODES_TRAVERSED_HEURISTIC
+					if (heuristic
+							.equals(TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC)) {
+
+						// Increment c1G by one
+						c1G++;
+
+					} else {
+
+						// Add tmpNode.cost to c1G
+						c1G = c1G + tmpNode.cost;
+					}
 
 				}
 
@@ -76,11 +101,21 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 					// Get parent of node from parentMap
 					tmpNode = parentMap.get(tmpNode);
 
-					// Add tmpNode.cost to c2G
-					c2G = c2G + tmpNode.cost;
+					// Check if the Heuristic is MIN_NODES_TRAVERSED_HEURISTIC
+					if (heuristic
+							.equals(TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC)) {
+
+						// Increment c1G by one
+						c1G++;
+
+					} else {
+
+						// Add tmpNode.cost to c1G
+						c1G = c1G + tmpNode.cost;
+					}
 				}
 
-				// Return 1 of c2 is best, -1 if c1 is and 0 if they are equal
+				// Return 1 if c2 is best, -1 if c1 is and 0 if they are equal
 				if ((heuristic.apply(c1.state) + c1G) > (heuristic
 						.apply(c2.state) + c2G)) {
 					return 1;
@@ -231,7 +266,7 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 		TouringRomania solver = new TouringRomania();
 		System.out.println("Starting search...");
 		Solution<City, DriveAction> solution = solver.search(problem,
-				TouringRomaniaProblem.MANHATTAN_DISTANCE_HEURISTIC);
+				TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC);
 		System.out.println("Found a solution with total cost "
 				+ solution.getCost());
 		System.out.println("Solution visits these cities: "
