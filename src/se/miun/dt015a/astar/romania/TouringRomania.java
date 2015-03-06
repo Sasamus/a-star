@@ -200,8 +200,6 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 			// Get the next node from frontier
 			node = frontier.poll();
 
-			// System.out.println(node.state);
-
 			// Check if node equals the goal state
 			if (problem.isGoal(node.state)) {
 
@@ -227,7 +225,7 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 					node = parent;
 				}
 
-				// Reverse path so it*s ordered from start to goal
+				// Reverse path so it's ordered from start to goal
 				Collections.reverse(path);
 
 				// Return a Solution made with path
@@ -246,22 +244,22 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 			// Iterate through the successors in successors
 			for (Successor<City, DriveAction> successor : successors) {
 
+				// Check if successors state is in frontier
 				boolean cityInFrontier = false;
-
 				for (Successor<City, DriveAction> succ : frontier) {
 					if (succ.state.equals(successor.state)) {
 						cityInFrontier = true;
 						break;
 					}
 				}
+				
+				// Map successor to node, it's parent
+				parentMap.put(successor, node);
 
 				// Check if successors state exists in explored or frontier
 				if (!explored.contains(successor.state) && !cityInFrontier) {
 
 					// If it doesn't
-
-					// Map successor to node, it's parent
-					parentMap.put(successor, node);
 
 					// Insert successor into frontier
 					frontier.add(successor);
@@ -279,7 +277,7 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 							// Check if successor is better than tmpNode
 							// according to
 							// comparator
-							if (0 > comparator.compare(tmpNode, successor)) {
+							if (0 < comparator.compare(tmpNode, successor)) {
 
 								// If it is, set replaceNode to tmpNode
 								replaceNode = tmpNode;
