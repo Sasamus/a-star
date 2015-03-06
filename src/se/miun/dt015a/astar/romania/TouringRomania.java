@@ -49,24 +49,84 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 			public int compare(Successor<City, DriveAction> c1,
 					Successor<City, DriveAction> c2) {
 
+				// TODO: Remove commented out part if certain it's not needed
+
+				// // Holds the g(n) cost of c1 and c2
+				// int c1G;
+				// int c2G;
+				//
+				// // Check if the Heuristic is MIN_NODES_TRAVERSED_HEURISTIC
+				// if (heuristic
+				// .equals(TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC))
+				// {
+				//
+				// // c1G and c2G will be counted as nodes
+				// c1G = 1;
+				// c2G = 1;
+				//
+				// } else {
+				//
+				// // c1G and c2G will be counted as distance
+				// c1G = c1.cost;
+				// c2G = c2.cost;
+				// }
+				//
+				// // Holds a temporary node, initialized to c1
+				// Successor<City, DriveAction> tmpNode = c1;
+				//
+				// // While tmpNode is a key in parentMap
+				// while (parentMap.containsKey(tmpNode)) {
+				//
+				// // Get parent of node from parentMap
+				// tmpNode = parentMap.get(tmpNode);
+				//
+				// // Check if the Heuristic is MIN_NODES_TRAVERSED_HEURISTIC
+				// if (heuristic
+				// .equals(TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC))
+				// {
+				//
+				// // Increment c1G by one
+				// c1G++;
+				//
+				// } else {
+				//
+				// // Add tmpNode.cost to c1G
+				// c1G = c1G + tmpNode.cost;
+				// }
+				//
+				// }
+				//
+				// // Set tmpNode to c2
+				// tmpNode = c2;
+				//
+				// // While tmpNode is a key in parentMap
+				// while (parentMap.containsKey(tmpNode)) {
+				//
+				// // Get parent of node from parentMap
+				// tmpNode = parentMap.get(tmpNode);
+				//
+				// // Check if the Heuristic is MIN_NODES_TRAVERSED_HEURISTIC
+				// if (heuristic
+				// .equals(TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC))
+				// {
+				//
+				// // Increment c1G by one
+				// c1G++;
+				//
+				// } else {
+				//
+				// // Add tmpNode.cost to c1G
+				// c1G = c1G + tmpNode.cost;
+				// }
+				// }
+
 				// Holds the g(n) cost of c1 and c2
 				int c1G;
 				int c2G;
 
-				// Check if the Heuristic is MIN_NODES_TRAVERSED_HEURISTIC
-				if (heuristic
-						.equals(TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC)) {
-
-					// c1G and c2G will be counted as nodes
-					c1G = 1;
-					c2G = 1;
-
-				} else {
-
-					// c1G and c2G will be counted as distance
-					c1G = c1.cost;
-					c2G = c2.cost;
-				}
+				// c1G and c2G will be counted as distance
+				c1G = c1.cost;
+				c2G = c2.cost;
 
 				// Holds a temporary node, initialized to c1
 				Successor<City, DriveAction> tmpNode = c1;
@@ -77,18 +137,8 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 					// Get parent of node from parentMap
 					tmpNode = parentMap.get(tmpNode);
 
-					// Check if the Heuristic is MIN_NODES_TRAVERSED_HEURISTIC
-					if (heuristic
-							.equals(TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC)) {
-
-						// Increment c1G by one
-						c1G++;
-
-					} else {
-
-						// Add tmpNode.cost to c1G
-						c1G = c1G + tmpNode.cost;
-					}
+					// Add tmpNode.cost to c1G
+					c1G = c1G + tmpNode.cost;
 
 				}
 
@@ -101,18 +151,8 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 					// Get parent of node from parentMap
 					tmpNode = parentMap.get(tmpNode);
 
-					// Check if the Heuristic is MIN_NODES_TRAVERSED_HEURISTIC
-					if (heuristic
-							.equals(TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC)) {
-
-						// Increment c1G by one
-						c1G++;
-
-					} else {
-
-						// Add tmpNode.cost to c1G
-						c1G = c1G + tmpNode.cost;
-					}
+					// Add tmpNode.cost to c1G
+					c1G = c1G + tmpNode.cost;
 				}
 
 				// Return 1 if c2 is best, -1 if c1 is and 0 if they are equal
@@ -160,6 +200,8 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 			// Get the next node from frontier
 			node = frontier.poll();
 
+			// System.out.println(node.state);
+
 			// Check if node equals the goal state
 			if (problem.isGoal(node.state)) {
 
@@ -204,19 +246,30 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 			// Iterate through the successors in successors
 			for (Successor<City, DriveAction> successor : successors) {
 
+				boolean cityInFrontier = false;
+
+				for (Successor<City, DriveAction> succ : frontier) {
+					if (succ.state.equals(successor.state)) {
+						cityInFrontier = true;
+						break;
+					}
+				}
+
 				// Check if successors state exists in explored or frontier
-				if (!explored.contains(successor.state)
-						&& !frontier.contains(successor.state)) {
+				if (!explored.contains(successor.state) && !cityInFrontier) {
+
+					// If it doesn't
 
 					// Map successor to node, it's parent
 					parentMap.put(successor, node);
 
-					// If it doesn't, insert successors state in frontier
+					// Insert successor into frontier
 					frontier.add(successor);
 
 				} else {
 
 					// If it does
+
 					// Iterate through frontier
 					for (Successor<City, DriveAction> tmpNode : frontier) {
 
@@ -266,7 +319,7 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 		TouringRomania solver = new TouringRomania();
 		System.out.println("Starting search...");
 		Solution<City, DriveAction> solution = solver.search(problem,
-				TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC);
+				TouringRomaniaProblem.STRAIGHT_LINE_DISTANCE_HEURISTIC);
 		System.out.println("Found a solution with total cost "
 				+ solution.getCost());
 		System.out.println("Solution visits these cities: "
