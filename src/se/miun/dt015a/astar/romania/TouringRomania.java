@@ -49,77 +49,6 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 			public int compare(Successor<City, DriveAction> c1,
 					Successor<City, DriveAction> c2) {
 
-				// TODO: Remove commented out part if certain it's not needed
-
-				// // Holds the g(n) cost of c1 and c2
-				// int c1G;
-				// int c2G;
-				//
-				// // Check if the Heuristic is MIN_NODES_TRAVERSED_HEURISTIC
-				// if (heuristic
-				// .equals(TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC))
-				// {
-				//
-				// // c1G and c2G will be counted as nodes
-				// c1G = 1;
-				// c2G = 1;
-				//
-				// } else {
-				//
-				// // c1G and c2G will be counted as distance
-				// c1G = c1.cost;
-				// c2G = c2.cost;
-				// }
-				//
-				// // Holds a temporary node, initialized to c1
-				// Successor<City, DriveAction> tmpNode = c1;
-				//
-				// // While tmpNode is a key in parentMap
-				// while (parentMap.containsKey(tmpNode)) {
-				//
-				// // Get parent of node from parentMap
-				// tmpNode = parentMap.get(tmpNode);
-				//
-				// // Check if the Heuristic is MIN_NODES_TRAVERSED_HEURISTIC
-				// if (heuristic
-				// .equals(TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC))
-				// {
-				//
-				// // Increment c1G by one
-				// c1G++;
-				//
-				// } else {
-				//
-				// // Add tmpNode.cost to c1G
-				// c1G = c1G + tmpNode.cost;
-				// }
-				//
-				// }
-				//
-				// // Set tmpNode to c2
-				// tmpNode = c2;
-				//
-				// // While tmpNode is a key in parentMap
-				// while (parentMap.containsKey(tmpNode)) {
-				//
-				// // Get parent of node from parentMap
-				// tmpNode = parentMap.get(tmpNode);
-				//
-				// // Check if the Heuristic is MIN_NODES_TRAVERSED_HEURISTIC
-				// if (heuristic
-				// .equals(TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC))
-				// {
-				//
-				// // Increment c1G by one
-				// c1G++;
-				//
-				// } else {
-				//
-				// // Add tmpNode.cost to c1G
-				// c1G = c1G + tmpNode.cost;
-				// }
-				// }
-
 				// Holds the g(n) cost of c1 and c2
 				int c1G;
 				int c2G;
@@ -252,7 +181,7 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 						break;
 					}
 				}
-				
+
 				// Map successor to node, it's parent
 				parentMap.put(successor, node);
 
@@ -314,13 +243,32 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 			System.out.println("  " + successor.state);
 		}
 
-		TouringRomania solver = new TouringRomania();
-		System.out.println("Starting search...");
-		Solution<City, DriveAction> solution = solver.search(problem,
-				TouringRomaniaProblem.STRAIGHT_LINE_DISTANCE_HEURISTIC);
+		// Get the starting time
+		final double startTime = System.currentTimeMillis();
+
+		Solution<City, DriveAction> solution = null;
+
+		// Solve puzzle 1000 times to get an average
+		for (int i = 0; i < 1000; i++) {
+
+			TouringRomania solver = new TouringRomania();
+
+			System.out.println("Starting search...");
+			solution = solver.search(problem,
+					TouringRomaniaProblem.STRAIGHT_LINE_DISTANCE_HEURISTIC);
+		}
+
+		// Get a stopping time
+		final double stopTime = System.currentTimeMillis();
+
 		System.out.println("Found a solution with total cost "
 				+ solution.getCost());
 		System.out.println("Solution visits these cities: "
 				+ solution.getStates());
+
+		// Print the average execution time
+		System.out.println("Total execution time: " + (stopTime - startTime)
+				/ 1000 + " milliseconds");
+
 	}
 }
