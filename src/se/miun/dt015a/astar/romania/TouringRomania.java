@@ -248,12 +248,13 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 
 		Solution<City, DriveAction> solution = null;
 
+		System.out.println("Starting search...");
+
 		// Solve puzzle 1000 times to get an average
 		for (int i = 0; i < 1000; i++) {
 
 			TouringRomania solver = new TouringRomania();
 
-			System.out.println("Starting search...");
 			solution = solver.search(problem,
 					TouringRomaniaProblem.STRAIGHT_LINE_DISTANCE_HEURISTIC);
 		}
@@ -267,7 +268,7 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 				+ solution.getStates());
 
 		// Print the average execution time
-		System.out.println("Total execution time: " + (stopTime - startTime)
+		System.out.println("Average execution time: " + (stopTime - startTime)
 				/ 1000 + " milliseconds");
 
 	}
