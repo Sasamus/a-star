@@ -39,76 +39,90 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 		// return randomSearch.search(problem, heuristic);
 		// /* ----- You should remove this ----- */
 
-		// Holds a map of children and their parents
-		HashMap<Successor<City, DriveAction>, Successor<City, DriveAction>> parentMap = new HashMap<Successor<City, DriveAction>, Successor<City, DriveAction>>();
+		// A class to represent nodes and their g value
+		class Node {
+
+			// Hold the Successor of the node
+			Successor<City, DriveAction> successor;
+
+			// Holds it's g value
+			int g;
+
+			/**
+			 * @return the successor
+			 */
+			public Successor<City, DriveAction> getSuccessor() {
+				return successor;
+			}
+
+			/**
+			 * @param successor
+			 *            the successor to set
+			 */
+			public void setSuccessor(Successor<City, DriveAction> successor) {
+				this.successor = successor;
+			}
+
+			/**
+			 * @return the g
+			 */
+			public int getG() {
+				return g;
+			}
+
+			/**
+			 * @param g
+			 *            the g to set
+			 */
+			public void setG(int g) {
+				this.g = g;
+			}
+		}
+		;
 
 		// A Comparator
-		final Comparator<Successor<City, DriveAction>> comparator = new Comparator<Successor<City, DriveAction>>() {
+		final Comparator<Node> comparator = new Comparator<Node>() {
 
 			@Override
-			public int compare(Successor<City, DriveAction> c1,
-					Successor<City, DriveAction> c2) {
+			public int compare(Node n1, Node n2) {
 
-				// Holds the g(n) cost of c1 and c2
-				int c1G;
-				int c2G;
-
-				// c1G and c2G will be counted as distance
-				c1G = c1.cost;
-				c2G = c2.cost;
-
-				// Holds a temporary node, initialized to c1
-				Successor<City, DriveAction> tmpNode = c1;
-
-				// While tmpNode is a key in parentMap
-				while (parentMap.containsKey(tmpNode)) {
-
-					// Get parent of node from parentMap
-					tmpNode = parentMap.get(tmpNode);
-
-					// Add tmpNode.cost to c1G
-					c1G = c1G + tmpNode.cost;
-
-				}
-
-				// Set tmpNode to c2
-				tmpNode = c2;
-
-				// While tmpNode is a key in parentMap
-				while (parentMap.containsKey(tmpNode)) {
-
-					// Get parent of node from parentMap
-					tmpNode = parentMap.get(tmpNode);
-
-					// Add tmpNode.cost to c1G
-					c1G = c1G + tmpNode.cost;
-				}
-
-				// Return 1 if c2 is best, -1 if c1 is and 0 if they are equal
-				if ((heuristic.apply(c1.state) + c1G) > (heuristic
-						.apply(c2.state) + c2G)) {
+				// Return 1 if n2 is best, -1 if n1 is and 0 if they are equal
+				if ((heuristic.apply(n1.getSuccessor().state) + n1.getG()) > (heuristic
+						.apply(n2.getSuccessor().state) + n2.getG())) {
 					return 1;
-				} else if ((heuristic.apply(c1.state) + c1G) < (heuristic
-						.apply(c2.state) + c2G)) {
+				} else if ((heuristic.apply(n1.getSuccessor().state) + n1
+						.getG()) < (heuristic.apply(n2.getSuccessor().state) + n2
+						.getG())) {
 					return -1;
 				}
 				return 0;
 			}
 		};
 
-		// A node to hold the current state, currently at the start state
-		Successor<City, DriveAction> node = new Successor<City, DriveAction>(
+		// Holds a map of children and their parents
+		HashMap<Node, Node> parentMap = new HashMap<Node, Node>();
+
+		// A Successor to hold the current state, currently at the start state
+		Successor<City, DriveAction> successor = new Successor<City, DriveAction>(
 				problem.getStart(), null, 0);
 
-		// A HashSet to hold the explored nodes
+		// Create an Node
+		Node node = new Node();
+
+		// Set Successor with successor
+		node.setSuccessor(successor);
+
+		// Set G to 0
+		node.setG(0);
+
+		// A HashSet to hold the explored cities
 		HashSet<City> explored = new HashSet<City>();
 
 		// Holds the successors
 		Set<Successor<City, DriveAction>> successors;
 
 		// Hold the nodes in the frontier
-		PriorityQueue<Successor<City, DriveAction>> frontier = new PriorityQueue<Successor<City, DriveAction>>(
-				comparator);
+		PriorityQueue<Node> frontier = new PriorityQueue<Node>(comparator);
 
 		// Holds the path to the goal
 		ArrayList<Successor<City, DriveAction>> path = new ArrayList<Successor<City, DriveAction>>();
@@ -129,14 +143,14 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 			// Get the next node from frontier
 			node = frontier.poll();
 
-			// Check if node equals the goal state
-			if (problem.isGoal(node.state)) {
+			// Check if nodes state equals the goal state
+			if (problem.isGoal(node.getSuccessor().state)) {
 
 				// Add node to path
-				path.add(node);
+				path.add(node.getSuccessor());
 
-				// A Successor to hold a parent node
-				Successor<City, DriveAction> parent = null;
+				// A Node to hold a parent node
+				Node parent = null;
 
 				// While node is a key in parentMap
 				while (parentMap.containsKey(node)) {
@@ -145,12 +159,12 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 					parent = parentMap.get(node);
 
 					// Add parent to path
-					path.add(parent);
+					path.add(parent.getSuccessor());
 
-					// Remove tmpNodes parent from parentMap
+					// Remove nodes parent from parentMap
 					parentMap.remove(node);
 
-					// Set tmpNode to parent
+					// Set node to parent
 					node = parent;
 				}
 
@@ -161,52 +175,63 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 				return new Solution<City, DriveAction>(path);
 			}
 
-			// Add node to explored
-			explored.add(node.state);
+			// Add nodes state to explored
+			explored.add(node.getSuccessor().state);
 
 			// Get Successors to node
-			successors = problem.getSuccessors(node.state);
+			successors = problem.getSuccessors(node.getSuccessor().state);
 
 			// Holds the Node to be removed
-			Successor<City, DriveAction> replaceNode = null;
+			Node replaceNode = null;
 
 			// Iterate through the successors in successors
-			for (Successor<City, DriveAction> successor : successors) {
+			for (Successor<City, DriveAction> tmpSuccessor : successors) {
 
 				// Check if successors state is in frontier
 				boolean cityInFrontier = false;
-				for (Successor<City, DriveAction> succ : frontier) {
-					if (succ.state.equals(successor.state)) {
+				for (Node tmpNode : frontier) {
+					if (tmpNode.getSuccessor().state.equals(tmpSuccessor.state)) {
 						cityInFrontier = true;
 						break;
 					}
 				}
 
-				// Map successor to node, it's parent
-				parentMap.put(successor, node);
+				// Create a Node
+				Node newNode = new Node();
 
-				// Check if successors state exists in explored or frontier
-				if (!explored.contains(successor.state) && !cityInFrontier) {
+				// Set Successor
+				newNode.setSuccessor(tmpSuccessor);
+
+				// Set G
+				newNode.setG(node.getG() + tmpSuccessor.cost);
+
+				// Map newNode to node, it's parent
+				parentMap.put(newNode, node);
+
+				// Check if newNodess state exists in explored or frontier
+				if (!explored.contains(newNode.getSuccessor().state)
+						&& !cityInFrontier) {
 
 					// If it doesn't
 
-					// Insert successor into frontier
-					frontier.add(successor);
+					// Insert newNode into frontier
+					frontier.add(newNode);
 
 				} else {
 
 					// If it does
 
 					// Iterate through frontier
-					for (Successor<City, DriveAction> tmpNode : frontier) {
+					for (Node tmpNode : frontier) {
 
 						// If tmpNode.state equals successor.state
-						if (tmpNode.state.equals(successor.state)) {
+						if (tmpNode.getSuccessor().state.equals(newNode
+								.getSuccessor().state)) {
 
 							// Check if successor is better than tmpNode
 							// according to
 							// comparator
-							if (0 < comparator.compare(tmpNode, successor)) {
+							if (0 < comparator.compare(tmpNode, newNode)) {
 
 								// If it is, set replaceNode to tmpNode
 								replaceNode = tmpNode;
@@ -221,8 +246,8 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 					// Remove replaceNode from frontier
 					frontier.remove(replaceNode);
 
-					// Add successor.state to frontier
-					frontier.add(successor);
+					// Add newNode to frontier
+					frontier.add(newNode);
 				}
 			}
 		}
@@ -250,7 +275,7 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 		TouringRomania solver = new TouringRomania();
 
 		solution = solver.search(problem,
-				TouringRomaniaProblem.STRAIGHT_LINE_DISTANCE_HEURISTIC);
+				TouringRomaniaProblem.MIN_NODES_TRAVERSED_HEURISTIC);
 
 		System.out.println("Found a solution with total cost "
 				+ solution.getCost());
