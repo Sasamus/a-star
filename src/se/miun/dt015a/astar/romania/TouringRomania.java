@@ -243,33 +243,19 @@ public class TouringRomania implements InformedSearch<City, DriveAction> {
 			System.out.println("  " + successor.state);
 		}
 
-		// Get the starting time
-		final double startTime = System.currentTimeMillis();
-
 		Solution<City, DriveAction> solution = null;
 
 		System.out.println("Starting search...");
 
-		// Solve puzzle 1000 times to get an average
-		for (int i = 0; i < 1000; i++) {
+		TouringRomania solver = new TouringRomania();
 
-			TouringRomania solver = new TouringRomania();
-
-			solution = solver.search(problem,
-					TouringRomaniaProblem.STRAIGHT_LINE_DISTANCE_HEURISTIC);
-		}
-
-		// Get a stopping time
-		final double stopTime = System.currentTimeMillis();
+		solution = solver.search(problem,
+				TouringRomaniaProblem.STRAIGHT_LINE_DISTANCE_HEURISTIC);
 
 		System.out.println("Found a solution with total cost "
 				+ solution.getCost());
 		System.out.println("Solution visits these cities: "
 				+ solution.getStates());
-
-		// Print the average execution time
-		System.out.println("Average execution time: " + (stopTime - startTime)
-				/ 1000 + " milliseconds");
 
 	}
 }
